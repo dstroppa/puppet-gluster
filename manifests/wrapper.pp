@@ -100,6 +100,8 @@ class gluster::wrapper(
 	# to be used as default gluster::volume brick list
 	$bricklist = split(inline_template("<%= @yaml_brick.keys.join(',') %>"), ',')
 
+    #TODO: Need to reorder the brick list
+
 	# semi ok method:
 	#$volumetree_defaults_all = {
 	#	"bricks" => $bricklist,
