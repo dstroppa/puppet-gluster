@@ -68,7 +68,7 @@ define gluster::volume::property(
 				'auth.deny' => ',',
 				default => '',
 			}
-			$safe_value = inline_template('<%= value.join(jchar) %>')
+			$safe_value = inline_template('<%= @value.join(@jchar) %>')
 		#} elsif ... {	# TODO: add more conversions here if needed
 
 		} else {
@@ -81,6 +81,7 @@ define gluster::volume::property(
 	# FIXME: check that the value we're setting isn't the default
 	# FIXME: you can check defaults with... gluster volume set help | ...
 	exec { "/usr/sbin/gluster volume set ${volume} ${key} ${safe_value}":
+        onlyif => "/usr/sbin/gluster volume info ${volume}",
 		unless => "/usr/bin/test \"`/usr/sbin/gluster volume --xml info ${volume} | ${vardir}/xml.py ${key}`\" = '${safe_value}'",
 		logoutput => on_failure,
 		require => [

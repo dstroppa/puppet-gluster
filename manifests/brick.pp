@@ -61,12 +61,13 @@ define gluster::brick(
 		default => '',
 	}
 
+    include gluster::brick::parted
 	# XFS mount options:
 	# http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=Documentation/filesystems/xfs.txt;hb=HEAD
 	if ( $valid_fstype == 'xfs' ) {
 		# exec requires
 		include gluster::brick::xfs
-		$exec_requires = [Package['xfsprogs']]
+		$exec_requires = [Package['xfsprogs', 'parted']]
 
 		# mkfs w/ uuid command
 		# NOTE: the -f forces creation when it sees an old xfs part
@@ -104,7 +105,7 @@ define gluster::brick(
 	} elsif ( $valid_fstype == 'ext4' ) {
 		# exec requires
 		include gluster::brick::ext4
-		$exec_requires = [Package['e2fsprogs']]
+		$exec_requires = [Package['e2fsprogs', 'parted']]
 
 		# mkfs w/ uuid command
 		$exec_mkfs = "/sbin/mkfs.${valid_fstype} -U '${fsuuid}' `/bin/readlink -e ${dev}`1"
@@ -116,7 +117,7 @@ define gluster::brick(
 	# put all the options in an array, remove the empty ones, and join with
 	# commas (this removes ',,' double comma uglyness)
 	# adding 'defaults' here ensures no ',' (leading comma) in mount command
-	$mount_options = inline_template('<%= (["defaults"]+options_list).delete_if {|x| x.empty? }.join(",") %>')
+	$mount_options = inline_template('<%= (["defaults"]+@options_list).delete_if {|x| x.empty? }.join(",") %>')
 
 	$exec_noop = $areyousure ? {
 		true => false,

@@ -23,6 +23,7 @@ define gluster::volume(
 	$vip = '',		# vip of the cluster (optional but recommended)
 	$start = undef		# start volume ? true, false (stop it) or undef
 ) {
+debug("********* Creating Volume ${name} **********")
 	# TODO: if using rdma, maybe we should pull in the rdma package... ?
 	$valid_transport = $transport ? {
 		'rdma' => 'rdma',
@@ -41,13 +42,13 @@ define gluster::volume(
 	}
 
 	# returns interface name that has vip, or '' if none are found.
-	$vipif = inline_template("<%= interfaces.split(',').find_all {|x| '${vip}' == scope.lookupvar('ipaddress_'+x) }[0,1].join('') %>")
+	$vipif = inline_template("<%= @interfaces.split(',').find_all {|x| '${vip}' == scope.lookupvar('ipaddress_'+x) }[0,1].join('') %>")
 
 	#Gluster::Brick[$bricks] -> Gluster::Volume[$name]	# volume requires bricks
 
 	# get the bricks that match our fqdn, and append /$name to their path.
 	# return only these paths, which can be used to build the volume dirs.
-	$volume_dirs = split(inline_template("<%= bricks.find_all{|x| x.split(':')[0] == '${fqdn}' }.collect {|y| y.split(':')[1].chomp('/')+'/${name}' }.join(' ') %>"), ' ')
+	$volume_dirs = split(inline_template("<%= @bricks.find_all{|x| x.split(':')[0] == '${fqdn}' }.collect {|y| y.split(':')[1].chomp('/')+'/${name}' }.join(' ') %>"), ' ')
 
 	file { $volume_dirs:
 		ensure => directory,		# make sure this is a directory
@@ -59,8 +60,10 @@ define gluster::volume(
 	}
 
 	# add /${name} to the end of each: brick:/path entry
-	$brick_spec = inline_template("<%= bricks.collect {|x| ''+x.chomp('/')+'/${name}' }.join(' ') %>")
+	$brick_spec = inline_template("<%= @bricks.collect {|x| ''+x.chomp('/')+'/${name}' }.join(' ') %>")
 
+debug("********* Virtual IP ${vip} **********")
+debug("********* VIP Interface ${vipif} **********")
 	# run if vip not defined (bypass mode) or if vip exists on this machine
 	if ($vip == '' or $vipif != '') {
 		# NOTE: This should only happen on one host!
@@ -80,6 +83,11 @@ define gluster::volume(
 			alias => "gluster-volume-create-${name}",
 		}
 	}
+    else {
+        exec { "/bin/echo ${name}":
+            alias => "gluster-volume-create-${name}",
+        }
+    }
 
 	# TODO:
 	#if $shorewall {

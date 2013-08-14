@@ -19,16 +19,17 @@ class gluster::server(
 	$hosts = [],	# this should be a list of fqdn's			# TODO: we could easily just setup gluster/shorewall by ip address instead of hostname!
 	$ips = [],	# this should be a list of ip's for each in hosts[]	# TODO: i would have rather this happen with a local dns resolver, but I can't figure out how to make one!	# NOTE: this can be overcome probably by using exported resources or dns names in shorewall (bad)
 	$clients = [],	# list of allowed client ip's
-	#$vip = '',	# vip of the cluster (optional but recommended)
+	$vip = '',	# vip of the cluster (optional but recommended)
 	$nfs = false,								# TODO
 	$shorewall = false,
 	$zone = 'net',								# TODO: allow a list of zones
 	$allow = 'all'
 ) {
-	# TODO: ensure these are from our 'gluster' repo
-	package { 'glusterfs-server':
-		ensure => present,
-	}
+    include gluster::package
+#
+#	package { 'glusterfs-server':
+#		ensure => present,
+#	}
 
 	# NOTE: not that we necessarily manage anything in here at the moment...
 	file { '/etc/glusterfs/':
@@ -84,7 +85,7 @@ class gluster::server(
 		}
 		# TODO: could the facter values help here ?
 		#$other_host_ips = inline_template("<%= ips.delete_if {|x| x == '${ipaddress}' }.join(',') %>")		# list of ips except myself
-		$source_ips = inline_template("<%= (ips+clients).uniq.delete_if {|x| x.empty? }.join(',') %>")
+		$source_ips = inline_template("<%= (@ips+@clients).uniq.delete_if {|x| x.empty? }.join(',') %>")
 		#$all_ips = inline_template("<%= (ips+[vip]+clients).uniq.delete_if {|x| x.empty? }.join(',') %>")
 		#$list_of_hosts_except_myself = split(inline_template("<%= host_list.delete_if {|x| x == '${fqdn}' }.join(' ') %>"), ' ')
 

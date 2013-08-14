@@ -25,6 +25,7 @@ define gluster::client(
 ) {
 	#mount -t glusterfs brick1.example.com:/test /test
 	include gluster::client::base
+    include gluster::package
 
 	$rw_bool = $rw ? {
 		true => 'rw',
