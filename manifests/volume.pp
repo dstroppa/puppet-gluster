@@ -23,7 +23,6 @@ define gluster::volume(
 	$vip = '',		# vip of the cluster (optional but recommended)
 	$start = undef		# start volume ? true, false (stop it) or undef
 ) {
-debug("********* Creating Volume ${name} **********")
 	# TODO: if using rdma, maybe we should pull in the rdma package... ?
 	$valid_transport = $transport ? {
 		'rdma' => 'rdma',
@@ -62,8 +61,6 @@ debug("********* Creating Volume ${name} **********")
 	# add /${name} to the end of each: brick:/path entry
 	$brick_spec = inline_template("<%= @bricks.collect {|x| ''+x.chomp('/')+'/${name}' }.join(' ') %>")
 
-debug("********* Virtual IP ${vip} **********")
-debug("********* VIP Interface ${vipif} **********")
 	# run if vip not defined (bypass mode) or if vip exists on this machine
 	if ($vip == '' or $vipif != '') {
 		# NOTE: This should only happen on one host!

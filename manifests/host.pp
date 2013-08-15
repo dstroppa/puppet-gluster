@@ -24,9 +24,6 @@ define gluster::host(
 ) {
     include gluster::package
 
-debug("********* Entering Host ${name} **********")
-debug("********* FQDN: ${fqdn} **********")
-
 	# if we're on itself
 	if ( "${fqdn}" == "${name}" ) {
 		# set a unique uuid per host
@@ -86,9 +83,6 @@ debug("********* FQDN: ${fqdn} **********")
 			mode => 600,					# u=rw,go=
 		}
 	}
-
-debug("********* Host ${name} completed **********")
-
 }
 
 # vim: ts=8
