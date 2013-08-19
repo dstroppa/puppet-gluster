@@ -10,6 +10,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "node#{i}" do |node|
       node.vm.hostname = "gluster-node#{i}.test"
       node.vm.network :private_network, ip: "192.168.1.6#{i}"
+      node.vm.provision :shell, :path => "examples/add_etc_hosts.sh"
       #node.vm.provision :shell, :inline => "sudo yum -y update"
       (0..1).each do |d|
         config.vm.provider "virtualbox" do |vb|
@@ -33,6 +34,7 @@ Vagrant.configure("2") do |config|
     node.vm.hostname = "gluster-node4.test"
     node.vm.network :private_network, ip: "192.168.1.64"
     node.vm.provision :shell, :path => "examples/create_vip.sh"
+    node.vm.provision :shell, :path => "examples/add_etc_hosts.sh"
     #node.vm.provision :shell, :inline => "sudo yum -y update"
     (0..1).each do |d|
       config.vm.provider "virtualbox" do |vb|

@@ -99,8 +99,11 @@ class gluster::wrapper(
 
 	# to be used as default gluster::volume brick list
 	$bricklist = split(inline_template("<%= @yaml_brick.keys.join(',') %>"), ',')
-
-    #TODO: Need to reorder the brick list
+debug("********* Brick List: ${bricklist} **********")
+$foo = inline_template("<% puts @bricklist.inspect %>")
+$bar = inline_template("<% puts @hash_host.keys.inspect %>")
+    # Sorting bricks to avoid 'Failed to perform brick order check.' warning
+    $sorted_bricklist = split(inline_template("<%= @bricklist.sort_by{|v| v.split(':')[1]}.join(',') %>"), ',')
 
 	# semi ok method:
 	#$volumetree_defaults_all = {
@@ -115,7 +118,7 @@ class gluster::wrapper(
 
 	# good method
 	$volumetree_defaults = {
-		'bricks' => $bricklist,
+		'bricks' => $sorted_bricklist,
 		'vip' => $vip
 	}
 	# loop through volumetree... if special defaults are missing, then add!
@@ -123,9 +126,6 @@ class gluster::wrapper(
     $volumetree_noclient = parseyaml(inline_template('<%= @volumetree.inject({}) {|h, (x,y)| h[x] = y.reject {|key, value| key == "clients" }; h }.to_yaml %>'))
     $volumetree_updated = inline_template('<%= @volumetree_noclient.inject({}) {|h, (x,y)| h[x] = y; @volumetree_defaults.each {|k,v| y[k] = h.fetch(k, v)}; h }.to_yaml %>')
 	$yaml_volume = parseyaml($volumetree_updated)
-#debug("********* YAML Volume Tree: ${yaml_volume} **********")
-#$foo = inline_template("<% puts @volumetree.inspect %>")
-#$bar = inline_template("<% puts @yaml_volume.inspect %>")
 	create_resources('gluster::volume', $yaml_volume)
 
 	#

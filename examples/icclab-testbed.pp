@@ -90,8 +90,8 @@ $nodetree = {
 		'ip' => '192.168.1.61',
 		'uuid' => '1f660ca2-2c78-4aa0-8f4d-21608218c69c',
 		'bricks' => {
-			'/mnt/brick11' => $brick11,
-			'/mnt/brick12' => $brick12
+			'/mnt/brick1' => $brick11,
+			'/mnt/brick2' => $brick12
 		}
 	},
 #	'gluster-node2.test' => {
@@ -114,8 +114,8 @@ $nodetree = {
         'ip' => '192.168.1.64',
         'uuid' => '4f8e3157-e1e3-4f13-b9a8-51e933d53915',
         'bricks' => {
-            '/mnt/brick41' => $brick41,
-            '/mnt/brick42' => $brick42
+            '/mnt/brick1' => $brick41,
+            '/mnt/brick2' => $brick42
         }
     }
 }
